@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Upload, History, Settings, LogOut, Shield, ChevronDown } from 'lucide-react';
+import { Menu, X, Upload, History, Settings, LogOut, Shield, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import Logo from '../common/Logo';
 
 interface NavbarProps {
@@ -11,6 +12,7 @@ interface NavbarProps {
 const Navbar = ({ type }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -43,14 +45,18 @@ const Navbar = ({ type }: NavbarProps) => {
   ];
   
   return (
-    <header className={`sticky top-0 z-40 w-full border-b ${type === 'dashboard' ? 'bg-white border-gray-200' : 'bg-white/90 backdrop-blur-md border-transparent'}`}>
+    <header className={`sticky top-0 z-40 w-full border-b ${
+      type === 'dashboard' 
+        ? 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800' 
+        : 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-transparent'
+    }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to={isAuthenticated ? '/app' : '/'} className="flex items-center space-x-2">
               <Logo size={32} />
-              <span className="text-xl font-bold text-primary-900">Pixel-Safe</span>
+              <span className="text-xl font-bold text-primary-900 dark:text-primary-100">Pixel-Safe</span>
             </Link>
           </div>
           
@@ -65,8 +71,8 @@ const Navbar = ({ type }: NavbarProps) => {
                     to={item.path}
                     className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
                       isActive(item.path)
-                        ? 'text-primary-700 bg-primary-50'
-                        : 'text-gray-700 hover:text-primary-700 hover:bg-gray-50'
+                        ? 'text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     <item.icon size={18} className="mr-2" />
@@ -74,12 +80,21 @@ const Navbar = ({ type }: NavbarProps) => {
                   </Link>
                 ))}
                 
+                {/* Theme toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                >
+                  {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                </button>
+                
                 {/* User dropdown - simplified for this implementation */}
                 <div className="relative ml-4">
                   <button
-                    className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary-700"
+                    className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-700 dark:text-primary-300">
                       {user?.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <span className="hidden lg:inline-block">{user?.name || 'User'}</span>
@@ -89,7 +104,7 @@ const Navbar = ({ type }: NavbarProps) => {
                   {/* Logout button */}
                   <button
                     onClick={handleLogout}
-                    className="ml-2 flex items-center px-3 py-2 text-sm rounded-md text-gray-700 hover:text-primary-700 hover:bg-gray-50 transition-colors"
+                    className="ml-2 flex items-center px-3 py-2 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
                     <LogOut size={18} className="mr-2" />
                     Logout
@@ -103,11 +118,20 @@ const Navbar = ({ type }: NavbarProps) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 rounded-md transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 rounded-md transition-colors"
                   >
                     {item.label}
                   </Link>
                 ))}
+                
+                {/* Theme toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                >
+                  {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                </button>
                 
                 {isAuthenticated ? (
                   <>
@@ -145,10 +169,18 @@ const Navbar = ({ type }: NavbarProps) => {
           </nav>
           
           {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          <div className="flex md:hidden items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+            
             <button
               type="button"
-              className="text-gray-700 hover:text-primary-700"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300"
               onClick={toggleMobileMenu}
               aria-expanded={mobileMenuOpen}
             >
@@ -166,7 +198,7 @@ const Navbar = ({ type }: NavbarProps) => {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="md:hidden">
-          <div className="space-y-1 px-4 py-3 border-t border-gray-200">
+          <div className="space-y-1 px-4 py-3 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
             {type === 'dashboard' ? (
               // Dashboard mobile nav
               <>
@@ -176,8 +208,8 @@ const Navbar = ({ type }: NavbarProps) => {
                     to={item.path}
                     className={`flex items-center px-3 py-2 text-base rounded-md ${
                       isActive(item.path)
-                        ? 'text-primary-700 bg-primary-50'
-                        : 'text-gray-700 hover:text-primary-700 hover:bg-gray-50'
+                        ? 'text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -190,7 +222,7 @@ const Navbar = ({ type }: NavbarProps) => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex w-full items-center px-3 py-2 text-base text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md"
+                  className="flex w-full items-center px-3 py-2 text-base text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 >
                   <LogOut size={20} className="mr-3" />
                   Logout
@@ -203,14 +235,14 @@ const Navbar = ({ type }: NavbarProps) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md"
+                    className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
                   </Link>
                 ))}
                 
-                <div className="pt-4 pb-3 border-t border-gray-200">
+                <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
                   {isAuthenticated ? (
                     <>
                       <Link
